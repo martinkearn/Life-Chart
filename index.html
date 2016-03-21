@@ -1,0 +1,178 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Life Chart</title>
+    <link rel="stylesheet" href="css/foundation.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <style>
+        .row.full-width {
+            width: 100%;
+            max-width: 100%; 
+        }
+        
+        #lifeTable > table{
+            font-size: 0.5rem;
+        }
+        
+        #lifeTable > table > td{
+            height: 2px;
+        }
+    </style>
+  </head>
+  <body>
+
+    <div class="row full-width">
+      <div class="large-12 columns">
+        <h1>Life Chart</h1>
+      </div>
+    </div>
+    
+    <div>
+      <div class="large-12 columns">
+            <form>
+
+                        <label>Day of birth
+                            <input id="birthdayDay" type="number">
+                        </label>
+
+                        <label>Month of birth
+                            <input id="birthdayMonth" type="number">
+                        </label>
+
+                        <label>Year of birth
+                            <input id="birthdayYear" type="number">
+                        </label>
+
+                        <input id="ShowMe" type="submit" class="large button" value="Show Me">
+ 
+            </form>
+        </div>
+    </div>
+    
+   
+    <div class="row full-width">
+      <div id="lifeTable" class="large-12 columns">
+
+      </div>
+    </div> 
+
+
+    <script src="js/vendor/jquery.min.js"></script>
+    <script src="js/vendor/what-input.min.js"></script>
+    <script src="js/foundation.min.js"></script>
+    <script src="js/vendor/moment-with-locales.min.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+      
+        $("#ShowMe").click(function(e) {
+            e.preventDefault();
+           
+            var birthdayDay = $("#birthdayDay").val();
+            var birthdayMonth = $("#birthdayMonth").val();
+            var birthdayYear = $("#birthdayYear").val();
+            
+            //debug hack
+            var birthdayDay = "28";
+            var birthdayMonth = "6";
+            var birthdayYear = "1979";
+            
+            CalcChart(birthdayDay, birthdayMonth, birthdayYear);
+        });
+        
+        function CalcChart(day, month, year)
+        {
+            //get todays date
+            var today = moment();
+            
+            //get birth date
+            var birthday = moment(year+"/"+month+"/"+day, 'YYYY-MM-DD');
+
+            var daysAlive = daysBetween(birthday, today);
+            var weeksAlive = parseInt(daysAlive / 7);
+            
+            var lifeTableDiv = document.getElementById("lifeTable");
+
+            var table = document.createElement('TABLE');
+            table.border = '1';
+
+            var tableBody = document.createElement('TBODY');
+            table.appendChild(tableBody);
+            
+            //add table header
+            var thr = document.createElement('TR');
+            tableBody.appendChild(thr);
+
+            for (var w = 0; w < 53; w++) {
+                var td = document.createElement('TH');
+                if (w==0)
+                {
+                    td.appendChild(document.createTextNode(""));
+                }
+                else
+                {
+                    td.appendChild(document.createTextNode(w));
+                }
+                thr.appendChild(td);
+            }
+            
+
+            var weeksPassed = 0;
+            for (var y = 0; y < 90; y++) {
+                //adds a row per year
+                var tr = document.createElement('TR');
+                tableBody.appendChild(tr);
+
+                for (var w = 0; w < 53; w++) {
+                    var td = document.createElement('TD');
+                                        
+                    //increment weeks passed count
+                    weeksPassed ++;
+                    
+                    if (w==0)
+                    {
+                        td.appendChild(document.createTextNode(y+1));
+                    }
+                    else
+                    {
+                        //adds a column per week in a year
+                        if (weeksPassed <= weeksAlive)
+                        {
+                            td.style.backgroundColor = "black";
+                        }  
+                    }
+
+                    
+                    tr.appendChild(td);
+                }
+            }
+            
+            
+            
+            lifeTableDiv.appendChild(table);
+            
+
+
+
+            
+            
+            //alert(daysAlive+","+weeksAlive);
+        }
+        
+        function treatAsUTC(date) {
+            var result = new Date(date);
+            result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+            return result;
+        }
+
+        function daysBetween(startDate, endDate) {
+            var millisecondsPerDay = 24 * 60 * 60 * 1000;
+            var result = (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay
+            return parseInt(result);
+        }
+    </script>
+  </body>
+</html>
